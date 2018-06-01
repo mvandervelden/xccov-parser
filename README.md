@@ -1,5 +1,10 @@
 # XCCOV Parser
 
+## Goal
+The aim of this project is to have a light-weight code coverage parser that can run in CI and do a simple report to Github to track trends in code coverage on a PR basis. Now Xcode exposes it's own coverage reporting tooling `xccov` (starting with Xcode 9.3), this should not be hard to achieve. Using Danger, it should also be light-weight to report coverage back to Github while being agnostic of CI service being used.
+
+The goal is not to have fancy trend analysis or full insight into coverage on line level, for the former, some service is required to store previous coverage on, for the latter it's easy enough to check Xcode for that.
+
 ## Usage
  ```sh
  #Compile your project with derived data going to `Build/`
@@ -21,6 +26,7 @@ Total coverage : 15.317%
 ## Notes:
 - It does not display Pods (except development Pods)
 - It does not display test targets
+- Inspired by: https://medium.com/xcblog/xccov-xcode-code-coverage-report-for-humans-466a4865aa18
 
 ## TODO:
 - [ ] Fancier output
