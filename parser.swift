@@ -3,12 +3,15 @@ import Foundation
 
 class Parser {
     func parse(_ fileName: String) {
-        let contents = readFile(fileName)
+        guard let contents = readFile(fileName) else {
+            print("Could not parse coverage structure from \(fileName)")
+            return
+        }
         let decoder = JSONDecoder()
 
         do {
             let coverage = try decoder.decode(Coverage.self, from: contents)
-            print(coverage.lineCoverage)
+            printCoverage(coverage)
         } catch {
             print("Error: \(error)")
         }
@@ -26,6 +29,27 @@ class Parser {
             print("Error: \(error)")
             return Data()
         }
+    }
+
+    private func printCoverage(_ coverage: Coverage) {
+
+        let nonTestTargets = coverage.targets.filter { target in
+            return !target.name.contains(".xctest")
+        }
+
+        let nonPodsTargets = nonTestTargets.filter { target in
+            return target.files.filter { file in
+                return file.path.contains("/Pods/")
+            }.count == 0
+        }
+
+        let maxLength = nonPodsTargets.reduce(0) { max($0, $1.name.count) }
+        let title = "Total coverage"
+
+        print(String(format: "%@: %.3f%%", title.padding(toLength: maxLength, withPad: " ", startingAt: 0), coverage.lineCoverage * 100))
+        nonPodsTargets
+            .sorted { $0.lineCoverage > $1.lineCoverage }
+            .forEach { print(String(format: " %@: %.3f%%", $0.name.padding(toLength: maxLength, withPad: " ", startingAt: 0), $0.lineCoverage * 100)) }
     }
 }
 
